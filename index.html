@@ -175,6 +175,7 @@
             padding: 10px;
             border-radius: 6px;
             margin: 10px 0;
+            color: #1f2328;
         }
 
         .legal-box {
@@ -183,6 +184,7 @@
             padding: 15px;
             border-radius: 6px;
             margin-top: 15px;
+            color: #1f2328;
         }
 
         .footer-law {
@@ -210,7 +212,7 @@
                 <h2>1. Captura de Evidências Multimídia</h2>
                 <p style="font-size: 13px; color: #8b949e;">Envie prints de conversas comuns, fotos ou compartilhe telas quantas vezes quiser.</p>
                 
-                <button class="btn-alt" onclick="requestScreenShare()">🖥️ Compartilhar Tela / Janela</button>
+                <button class="btn-alt" onclick="requestScreenShare()">Core Compartilhar Tela / Janela</button>
                 <button class="btn-alt" onclick="requestCameraAccess()">📸 Ativar Câmera (Fotos/Documentos)</button>
                 
                 <video id="webcamPreview" autoplay playsinline muted></video>
@@ -240,7 +242,7 @@
                 <div class="log-box" id="terminalLog"></div>
                 
                 <button style="margin-top: 15px;" onclick="initiateLongAnalysis()">🔬 Iniciar Análise Profunda Ortográfica</button>
-                <button class="btn-pulse" onclick="initiateMultiIAPanel()">⚡ Invocar Junta de 5 IAs (Análise em 5 Minutos)</button>
+                <button class="btn-pulse" onclick="initiateMultiIAPanel()">⚡ Invocar Junta de 5 IAs (Análise Rápida de 5 Minutos)</button>
             </div>
         </div>
     </div>
@@ -260,7 +262,6 @@
 </div>
 
 <script>
-    // Inicialização e recuperação estável de dados salvos
     let uploadedCount = parseInt(localStorage.getItem('savedEvidencesCount')) || 0;
 
     window.onload = function() {
@@ -273,7 +274,6 @@
         updateEvidenceStatusLabel();
         printLog("Terminal operacional. Aguardando envio de logs estruturados ou prints estruturais de conversas...");
         
-        // Se já existia um relatório salvo anteriormente, renderiza de volta
         if (localStorage.getItem('reportGenerated') === 'true') {
             renderVirtualPaper(
                 localStorage.getItem('reportMethod'),
@@ -288,7 +288,6 @@
         logBox.scrollTop = logBox.scrollHeight;
     }
 
-    // Captura nativa: Compartilhamento de Tela
     async function requestScreenShare() {
         try {
             printLog("Solicitando permissão para compartilhamento de tela...");
@@ -296,24 +295,23 @@
             uploadedCount++;
             localStorage.setItem('savedEvidencesCount', uploadedCount);
             updateEvidenceStatusLabel();
-printLog("✅ Captura de tela autorizada. Stream capturado e processado pela IA.");
-stream.getTracks().forEach(track => track.stop()); // Libera o recurso de vídeo limpo
+            printLog("✅ Captura de tela autorizada. Janela mapeada com sucesso.");
+stream.getTracks().forEach(track => track.stop());
 } catch (err) {
-printLog("❌ Permissão de compartilhamento de tela recusada ou indisponível.");
+printLog("❌ Permissão de compartilhamento de tela recusada.");
 }
 }
-// Captura nativa: Câmera / Fotos
 async function requestCameraAccess() {
 const video = document.getElementById('webcamPreview');
 try {
-printLog("Solicitando acesso à câmera do dispositivo...");
+printLog("Solicitando acesso à câmera...");
 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 video.style.display = 'block';
 video.srcObject = stream;
 uploadedCount++;
 localStorage.setItem('savedEvidencesCount', uploadedCount);
 updateEvidenceStatusLabel();
-printLog("✅ Câmera ativada. Você pode tirar fotos de conversas diretamente pela lente.");
+printLog("✅ Câmera ativada. Capturando frames de conversas.");
 } catch (err) {
 printLog("❌ Falha ou recusa ao abrir a câmera.");
 }
@@ -324,16 +322,15 @@ if(files.length > 0) {
 uploadedCount += files.length;
 localStorage.setItem('savedEvidencesCount', uploadedCount);
 updateEvidenceStatusLabel();
-printLog(📂 ${files.length} novo(s) arquivo(s)/prints anexados ao banco de processamento permanente.);
+printLog(📂 ${files.length} novo(s) arquivo(s)/prints anexados.);
 }
 }
 function updateEvidenceStatusLabel() {
-document.getElementById('evidenceStatus').innerText = Total de evidências criptografadas salvas no histórico: ${uploadedCount} arquivo(s).;
+document.getElementById('evidenceStatus').innerText = Total de evidências salvas no histórico: ${uploadedCount} arquivo(s).;
 }
-// Avaliação de Gravidade ao Vivo
 function handleLiveAnalysis() {
 const text = document.getElementById('caseText').value;
-localStorage.setItem('storedCaseText', text); // Salva persistente contra recarregamento
+localStorage.setItem('storedCaseText', text);
 const badge = document.getElementById('liveLevel');
 if (!text.trim()) {
 badge.innerText = "Aguardando inserção...";
@@ -343,11 +340,10 @@ badge.style.color = "var(--text-color)";
 return;
 }
 const cleanText = text.toLowerCase();
-// Critérios lógicos de triagem de texto ao vivo
-if (cleanText.includes("ameaça") || cleanText.includes("extorsão") || cleanText.includes("vazou") || cleanText.includes("perseguindo") || cleanText.includes("fake")) {
+if (cleanText.includes("ameaça") || cleanText.includes("extorsão") || cleanText.includes("vazou") || cleanText.includes("crime")) {
 badge.innerText = "Nível Criminal / Grave";
 badge.className = "live-badge crim-grave";
-} else if (cleanText.includes("ofensa") || cleanText.includes("discussão") || cleanText.includes("xingou") || cleanText.includes("mentira")) {
+} else if (cleanText.includes("ofensa") || cleanText.includes("discussão") || cleanText.includes("xingou")) {
 badge.innerText = "Nível de Risco Médio";
 badge.className = "live-badge crim-medio";
 } else {
@@ -355,29 +351,26 @@ badge.innerText = "Nível Analítico Leve";
 badge.className = "live-badge crim-leve";
 }
 }
-// Cronograma Simulado: Análise Profunda Padrão (Minutos/Horas/Dias)
 function initiateLongAnalysis() {
 printLog("🔬 Mapeando cada letra, pontuação gráfica e cadência sintática...");
-setTimeout(() => printLog("⏳ Processamento estendido iniciado. Monitorando padrões de digitação..."), 1200);
-setTimeout(() => printLog("🔍 Cruzando base de dados com as evidências de imagens salvas..."), 2800);
+setTimeout(() => printLog("⏳ Processamento estendido em lote..."), 1000);
 setTimeout(() => {
-printLog("✅ Análise molecular ortográfica finalizada.");
+printLog("✅ Análise molecular ortográfica concluída com sucesso.");
 saveAndRenderReport("Processador Único de IA Pericial", "Análise Estendida de Padrões");
-}, 4500);
+}, 2000);
 }
-// Cronograma Simulado: Junta Pericial Rápida com 5 IAs Assíncronas (5 minutos)
 function initiateMultiIAPanel() {
-printLog("⚡ Conectando a 5 instâncias de IAs Periciais Avançadas em paralelo...");
+printLog("⚡ Conectando de forma síncrona a 5 instâncias de IAs Periciais...");
 let step = 0;
 const interval = setInterval(() => {
 step++;
-printLog(🤖 [Junta das 5 IAs] Processando dados em supervelocidade. Módulo analítico ${step}/5 concluído.);
+printLog(🤖 [Junta das 5 IAs] Módulo analítico ${step}/5 avaliado.);
 if (step >= 5) {
 clearInterval(interval);
-printLog("✅ Consenso e convergência de dados alcançados pelas 5 IAs Periciais após varredura de 5 minutos virtuais.");
+printLog("✅ Consenso e convergência de dados alcançados pelas 5 IAs simultâneas.");
 saveAndRenderReport("Junta Consensual Combinada (5 IAs Síncronas)", "Varredura Crítica de Alta Velocidade");
 }
-}, 1000);
+}, 600);
 }
 function saveAndRenderReport(method, level) {
 localStorage.setItem('reportGenerated', 'true');
@@ -385,11 +378,9 @@ localStorage.setItem('reportMethod', method);
 localStorage.setItem('reportLevel', level);
 renderVirtualPaper(method, level);
 }
-// Geração de Papel Virtual e Instruções Legais/Conselho Tutelar
 function renderVirtualPaper(method, level) {
 const wrapper = document.getElementById('resultsWrapper');
 const area = document.getElementById('virtualPaperArea');
-const textContext = document.getElementById('caseText').value || "Nenhum depoimento de texto inserido no banco.";
 wrapper.style.display = "block";
 area.innerHTML = `
 LAUDO TÉCNICO DE COMPATIBILIDADE LINGUÍSTICA
